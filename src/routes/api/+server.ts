@@ -16,20 +16,31 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const user = {
       name: "Dencelle Bati",
-      likes: [ "brownies", "fried chicken"],
-      hobbies: ["Tekken 8", "Farlight84", "Valorant"],
+      age: 21,
+      Gender: "Male",
+      location: "West Bajac-Bajac, Olongapo City, Zambales",
+      Education: "Bachelor of Science in Computer Science",
+      likes: ["brownies", "fried chicken", "ice cream"],
+      hobbies: ["mobile legends", "chess", "basketball", "watching movie", "billiards"],
       userType: "Master User",
     };
 
     console.log("Sending message to Ollama...");
 
     const chat = await ollama.chat({
-      model: "deepseek-r1:latest",  // confirm this matches `ollama list`
+      model: "deepseek-r1:1.5b", 
       messages: [
         {
           role: "system",
-          content: `You are a personal assistant for Dencelle Bati. You ONLY answer questions based on the following data: ${JSON.stringify(user)}. If not related, answer "I don't know".`,
-        },
+          content: `You are a helpful personal assistant for Dencelle Bati.
+                    You have the following information about Dencelle Bati:${JSON.stringify(user)}
+                    Your job is to answer any questions using this data.
+                    Important rules:
+                    - Only use the given data to answer, or infer based on what you know from the data.
+                    - Do not make up random facts that aren't connected to the data.
+                    - If there is no logical answer, respond: "Hmm, I couldn't find that in the info I have."
+                    "`,
+                            },
         {
           role: "user",
           content: chatMessage,
@@ -43,7 +54,6 @@ export const POST: RequestHandler = async ({ request }) => {
   } catch (error: any) {
     console.error("Server error:", error);
 
-    // Send the actual error message back in the response for debugging
     return json(
       { error: "Internal Server Error", details: error.message || error },
       { status: 500 }
